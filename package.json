@@ -10,7 +10,8 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev_old": "nest start --watch",
+    "start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -18,10 +19,12 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "css:watch": "tailwindcss -i ./public/input.css -o ./public/output.css --watch"
   },
   "dependencies": {
     "@nestjs/apollo": "^10.1.6",
+    "@nestjs/axios": "^1.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",
@@ -30,15 +33,22 @@
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/typeorm": "^9.0.1",
     "apollo-server-express": "^3.11.1",
+    "autoprefixer": "^10.4.13",
     "graphql": "^16.6.0",
     "hbs": "^4.2.0",
     "mysql2": "^2.3.3",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
+    "postcss": "^8.4.19",
+    "postcss-loader": "^7.0.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
+    "run-script-webpack-plugin": "^0.1.1",
     "rxjs": "^7.2.0",
-    "typeorm": "^0.3.10"
+    "tailwindcss": "^3.2.4",
+    "typeorm": "^0.3.10",
+    "webpack": "^5.75.0",
+    "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

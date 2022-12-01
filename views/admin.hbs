@@ -1,0 +1,29 @@
+{{! prettier-ignore }}
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/output.css" rel="stylesheet" />
+    <title>WiFi Portal Admin</title>
+  </head>
+  <body class="bg-blue-500">
+    <!-- make div which hold background image semi-transparent and full screen size -->
+    <div class="bg-auto bg-center bg-opacity-25 fixed w-full h-full -z-0">
+      <div style="background-image: url('/images/bg-portal.jpeg')" class="h-full w-full opacity-75 fixed" />
+    </div>
+
+
+    <div class="container mx-auto p-16 max-w-screen-xlg opacity-100 z-10 relative">
+      <!-- create a card with tailwind -->
+      <div class="bg-white rounded-lg shadow-2xl p-4">
+        <h1 class="text-2xl font-bold mb-6">Welcome!</h1>
+        <form class="text-gray-600">
+          <p>{{message}}</p>
+        </form>
+      </div>
+
+      <!-- use footer partial -->
+      {{!-- {{> footer }} --}}
+    </div>
+  </body>
+</html>

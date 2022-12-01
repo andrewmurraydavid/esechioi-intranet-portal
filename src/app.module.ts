@@ -2,9 +2,13 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { EntitiesModuleModule } from './entities-module/entities-module.module';
-import { GraphQlModule } from './graph-ql/graph-ql.module';
-import { MacsResolver } from './macs/macs.resolver';
+import { EntitiesModuleModule } from './entities-config/entities-module.module';
+import { MacsService } from './services/macs.service';
+import { repositoryProviders } from './Repos.providers';
+import { AdminController } from './admin.controller';
+import { HttpModule } from '@nestjs/axios';
+import { UDMProService } from './services/udmpro.service';
+import * as https from 'https';
 
 @Module({
   imports: [
@@ -13,9 +17,15 @@ import { MacsResolver } from './macs/macs.resolver';
       envFilePath: ['.env', '.env.local'],
     }),
     EntitiesModuleModule,
-    GraphQlModule,
+    HttpModule.register({
+      timeout: 5000,
+      baseURL: `https://${process.env.UDM_IP}/proxy/network/api/`,
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false,
+      }),
+    }),
   ],
-  controllers: [AppController],
-  providers: [AppService, MacsResolver],
+  controllers: [AppController, AdminController],
+  providers: [...repositoryProviders, AppService, MacsService, UDMProService],
 })
 export class AppModule {}

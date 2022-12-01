@@ -1,8 +1,8 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, DataSource, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Index('username', ['username'], {})
-@Entity('radcheck', { schema: 'radius' })
-export class Radcheck {
+@Entity('radreply', { schema: 'radius' })
+export class Radreply {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id', unsigned: true })
   id: number;
 
@@ -12,7 +12,7 @@ export class Radcheck {
   @Column('varchar', { name: 'attribute', length: 64, default: () => "''" })
   attribute: string;
 
-  @Column('char', { name: 'op', length: 2, default: () => "'=='" })
+  @Column('char', { name: 'op', length: 2, default: () => "'='" })
   op: string;
 
   @Column('varchar', { name: 'value', length: 253, default: () => "''" })

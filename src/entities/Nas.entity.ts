@@ -1,4 +1,4 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, DataSource, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Index('nasname', ['nasname'], {})
 @Entity('nas', { schema: 'radius' })

@@ -1,4 +1,4 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, DataSource, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Index('username', ['username'], {})
 @Entity('radpostauth', { schema: 'radius' })
