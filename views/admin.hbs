@@ -4,26 +4,66 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="/output.css" rel="stylesheet" />
+    <link href="/md-icons.min.css" rel="stylesheet" />
+    
     <title>WiFi Portal Admin</title>
   </head>
   <body class="bg-blue-500">
     <!-- make div which hold background image semi-transparent and full screen size -->
-    <div class="bg-auto bg-center bg-opacity-25 fixed w-full h-full -z-0">
-      <div style="background-image: url('/images/bg-portal.jpeg')" class="h-full w-full opacity-75 fixed" />
-    </div>
-
-
-    <div class="container mx-auto p-16 max-w-screen-xlg opacity-100 z-10 relative">
-      <!-- create a card with tailwind -->
-      <div class="bg-white rounded-lg shadow-2xl p-4">
-        <h1 class="text-2xl font-bold mb-6">Welcome!</h1>
-        <form class="text-gray-600">
-          <p>{{message}}</p>
-        </form>
+    <div class="bg-auto bg-center bg-opacity-25 fixed w-full h-full -z-0
+      overflow-auto">
+      <div style="background-image: url('/images/bg-portal.jpeg')" class="h-full
+        w-full opacity-75 fixed" />
       </div>
 
-      <!-- use footer partial -->
-      {{!-- {{> footer }} --}}
-    </div>
-  </body>
-</html>
+
+      <div class="container mx-auto p-16 max-w-screen-xlg opacity-100 z-10
+        relative overflow-auto">
+        <!-- create a card with tailwind -->
+        <div class="bg-white rounded-lg shadow-2xl p-4">
+          <h1 class="text-2xl font-bold mb-6">Welcome!</h1>
+
+          {{!-- foreach client in clients --}}
+          <div class="flex flex-col">
+            {{#each clients}}
+            {{!-- create a stacked list With right-justified second column --}}
+            <div class="flex flex-row justify-between my-4 p-6 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700">
+              <div class="flex flex-col">
+                <div class="text-lg font-bold text-blue-800">{{user.username}}</div>
+                <div class="text-sm font-light text-gray-700">
+                  Started at {{dateTime start}}
+                </div>
+                <div class="text-sm font-light text-gray-700">
+                  {{#if expired}}
+                  <span class="text-red-500">Expired at {{dateRelative end}}</span>
+                  {{else}}
+                  <span class="text-green-700">Active until {{dateTime end}}</span>
+                  {{/if}}
+                </div>
+              </div>
+              <div class="flex flex-col w-48 ">
+                <div class="text-lg font-bold text-blue-800">IP:
+                  {{#unless ip}} N/A
+                  {{else}} {{ip}}
+                  {{/unless}}
+                </div>
+                <div class="text-sm font-light text-gray-700">{{mac}}</div>
+                <div class="text-sm font-light text-gray-700">
+                <!-- TX is the received data by the client from the internet-->
+                <!-- RX is the sent data by the client to the internet-->
+                <i class="mdi mdi-menu-down text-green-600"></i>{{numberToBytes tx_bytes}} /
+                <i class="mdi mdi-menu-up text-red-600"></i>{{numberToBytes rx_bytes}}
+                </div>
+              </div>
+            </div>
+            {{{json this}}}
+            {{/each}}
+            {{!-- end foreach --}}
+          </div>
+        </div>
+
+        <!-- use footer partial -->
+        {{!-- {{> footer }} --}}
+      </div>
+    </body>
+  </html>

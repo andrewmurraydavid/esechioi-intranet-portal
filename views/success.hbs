@@ -9,26 +9,29 @@
   <body class="bg-blue-500">
     <!-- make div which hold background image semi-transparent and full screen size -->
     <div class="bg-auto bg-center bg-opacity-25 fixed w-full h-full -z-0">
-      <div style="background-image: url('/images/bg-portal.jpeg')" class="h-full w-full opacity-75 fixed" />
-    </div>
-
-
-    <div class="container mx-auto p-16 max-w-screen-md opacity-100 z-10 relative">
-      <!-- create a card with tailwind -->
-      <div class="bg-white rounded-lg shadow-2xl p-4">
-        <h1 class="text-2xl font-bold mb-6">Success!</h1>
-          <p>You have successfully registered to <strong>{{ssid}}</strong>!</p>
-
-          <p>Feel free to ask question if you have issues with the WiFi or anything else!</p>
-          <p class="mt-8 mb-6">You can close this page!</p>
-          <a href="{{redirectUrl}}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mt-6 rounded">
-          Close this window
-          </a>
-
+      <div style="background-image: url('/images/bg-portal.jpeg')" class="h-full
+        w-full opacity-75 fixed" />
       </div>
 
-      <!-- use footer partial -->
-      {{!-- {{> footer }} --}}
-    </div>
-  </body>
-</html>
+
+      <div class="container mx-auto p-16 max-w-screen-md opacity-100 z-10
+        relative">
+        <!-- create a card with tailwind -->
+        <div class="bg-white rounded-lg shadow-2xl p-4">
+          <h1 class="text-2xl font-bold mb-6">Success!</h1>
+          <p>You have successfully registered to <strong>{{ssid}}</strong>!</p>
+          <p>Feel free to ask question if you have issues with the WiFi or
+            anything else!</p>
+          <p class="mt-8 mb-6">You can close this page!</p>
+          <a href="{{redirectUrl}}" class="bg-blue-500 hover:bg-blue-700
+            text-white font-bold py-2 px-4 mt-6 rounded">
+            Close this window
+          </a>
+
+        </div>
+
+        <!-- use footer partial -->
+        {{!-- {{> footer }} --}}
+      </div>
+    </body>
+  </html>

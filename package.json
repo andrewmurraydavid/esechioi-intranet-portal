@@ -23,6 +23,7 @@
     "css:watch": "tailwindcss -i ./public/input.css -o ./public/output.css --watch"
   },
   "dependencies": {
+    "@mdi/font": "^7.0.96",
     "@nestjs/apollo": "^10.1.6",
     "@nestjs/axios": "^1.0.0",
     "@nestjs/common": "^9.0.0",
@@ -35,7 +36,9 @@
     "apollo-server-express": "^3.11.1",
     "autoprefixer": "^10.4.13",
     "graphql": "^16.6.0",
+    "handlebars-helpers": "^0.10.0",
     "hbs": "^4.2.0",
+    "luxon": "^3.1.1",
     "mysql2": "^2.3.3",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",

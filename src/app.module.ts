@@ -9,6 +9,7 @@ import { AdminController } from './admin.controller';
 import { HttpModule } from '@nestjs/axios';
 import { UDMProService } from './services/udmpro.service';
 import * as https from 'https';
+import { UsersService } from './services/users.service';
 
 @Module({
   imports: [
@@ -26,6 +27,12 @@ import * as https from 'https';
     }),
   ],
   controllers: [AppController, AdminController],
-  providers: [...repositoryProviders, AppService, MacsService, UDMProService],
+  providers: [
+    ...repositoryProviders,
+    AppService,
+    MacsService,
+    UDMProService,
+    UsersService,
+  ],
 })
 export class AppModule {}
