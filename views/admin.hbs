@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="/output.css" rel="stylesheet" />
     <link href="/md-icons.min.css" rel="stylesheet" />
-    
+
     <title>WiFi Portal Admin</title>
   </head>
   <body class="bg-blue-500">
@@ -17,7 +17,8 @@
       </div>
 
 
-      <div class="container mx-auto p-16 max-w-screen-xlg opacity-100 z-10
+      <div class="container mx-auto p-8 md:p-16 max-w-screen-xlg opacity-100
+        z-10
         relative overflow-auto">
         <!-- create a card with tailwind -->
         <div class="bg-white rounded-lg shadow-2xl p-4">
@@ -26,44 +27,128 @@
           {{!-- foreach client in clients --}}
           <div class="flex flex-col">
             {{#each clients}}
+            <!-- ignore if no user is found -->
+            {{#if user}}
             {{!-- create a stacked list With right-justified second column --}}
-            <div class="flex flex-row justify-between my-4 p-6 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700">
-              <div class="flex flex-col">
-                <div class="text-lg font-bold text-blue-800">{{user.username}}</div>
+            <div class="flex flex-col md:flex-row justify-between my-4 p-6
+              bg-white border
+              border-gray-200 rounded-lg shadow-md dark:bg-gray-800
+              dark:border-gray-700">
+              <div class="flex flex-col w-full">
+                <div>
+                  <span class="text-lg font-bold text-blue-800">
+                    {{user.fullname}}
+                  </span>
+                  as {{user.username}}
+                </div>
+                {{#if last_seen}}
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                  Last seen: {{dateTime last_seen}}
+                </div>
+                {{/if}}
+                {{#if (eq status 'online')}}
+                <div class="text-gray-600 dark:text-gray-400 text-sm">
+                  <i class="mdi mdi-lan-connect text-lg"></i>
+                  They are currently connected to: <strong>{{essid}}</strong>
+                  and have been for
+                  {{formattedDuration uptime}}
+                </div>
+                {{else}}
+                <div class="text-sm">
+                  <i class="mdi mdi-lan-disconnect text-lg"></i>
+                  <span class="text-red-600 dark:text-red-400 italic">They are
+                    currently offline</span>
+                </div>
+                {{/if}}
                 <div class="text-sm font-light text-gray-700">
                   Started at {{dateTime start}}
                 </div>
                 <div class="text-sm font-light text-gray-700">
                   {{#if expired}}
-                  <span class="text-red-500">Expired at {{dateRelative end}}</span>
+                  <span class="text-red-500">Expired {{dateRelative end}}</span>
                   {{else}}
                   <span class="text-green-700">Active until {{dateTime end}}</span>
                   {{/if}}
                 </div>
-              </div>
-              <div class="flex flex-col w-48 ">
-                <div class="text-lg font-bold text-blue-800">IP:
-                  {{#unless ip}} N/A
-                  {{else}} {{ip}}
-                  {{/unless}}
+
+                <form action="/admin-sta-actions" method="POST">
+                  <div class="flex flex-row justify-between mt-4 max-w-xs
+                    flex-wrap">
+                    <button type="submit" class="flex flex-row items-center
+                      justify-center px-4 py-2 bg-blue-500 text-white
+                      rounded-md hover:bg-blue-600 focus:outline-none
+                      focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                      name="action" value="renew">
+                      <i class="mdi mdi-autorenew"></i>
+                      <span class="ml-2">Renew</span>
+                    </button>
+                    <button type="submit" class="flex flex-row items-center
+                      justify-center px-4 py-2 bg-red-500 text-white
+                      rounded-md hover:bg-red-600 focus:outline-none
+                      focus:ring-2 focus:ring-red-400 focus:ring-opacity-75"
+                      name="action" value="kick">
+                      <i class="mdi mdi-logout"></i>
+                      <span class="ml-2">Kick</span>
+                    </button>
+                    {{#if blocked}}
+                    <button type="submit" class="flex flex-row items-center
+                      justify-center px-4 py-2 bg-yellow-500 text-white
+                      rounded-md hover:bg-yellow-600 focus:outline-none
+                      focus:ring-2 focus:ring-yellow-400
+                      focus:ring-opacity-75" name="action"
+                      value="unblock">
+                      <i class="mdi mdi-lock-open"></i>
+                      <span class="ml-2">Unblock</span>
+                    </button>
+                    {{else}}
+                    <button type="submit" class="flex flex-row items-center
+                      justify-center px-4 py-2 bg-red-500 text-white
+                      rounded-md hover:bg-red-600 focus:outline-none
+                      focus:ring-2 focus:ring-red-400
+                      focus:ring-opacity-75" name="action"
+                      value="block">
+                      <i class="mdi mdi-lock"></i>
+                      <span class="ml-2">Block</span>
+                    </button>
+                    {{/if}}
+                  </button>
                 </div>
-                <div class="text-sm font-light text-gray-700">{{mac}}</div>
-                <div class="text-sm font-light text-gray-700">
+                <input type="hidden" name="mac" value="{{mac}}" />
+              </form>
+            </div>
+            <div class="flex flex-col w-60 flex-shrink-0">
+              <div class="text-lg font-bold text-blue-800">IP:
+                {{#unless ip}} N/A
+                {{else}} {{ip}}
+                {{/unless}}
+              </div>
+              <div class="text-sm font-light text-gray-700">{{{macCode mac}}}</div>
+              <div class="text-sm font-light text-gray-700">
+                Data Usage:
+                <span>{{{rx}}}</span>
+                <span class="-m-3">{{{tx}}}</span>
+                <span class="m-2">
+                  {{numberToBytes bytes}}
+                </span>
+                <br class="text-base" />
                 <!-- TX is the received data by the client from the internet-->
                 <!-- RX is the sent data by the client to the internet-->
-                <i class="mdi mdi-menu-down text-green-600"></i>{{numberToBytes tx_bytes}} /
-                <i class="mdi mdi-menu-up text-red-600"></i>{{numberToBytes rx_bytes}}
-                </div>
+                {{{rx}}}{{numberToBytes tx_bytes}} / {{{tx}}}{{numberToBytes
+                rx_bytes}}
               </div>
             </div>
-            {{{json this}}}
-            {{/each}}
-            {{!-- end foreach --}}
           </div>
+          {{else}}
+          MISSING DATA FOR: {{{macCode mac}}}
+          {{/if}}
+          <div class="text-xs">{{{json this}}}</div>
+          {{/each}}
+          {{!-- end foreach --}}
         </div>
-
-        <!-- use footer partial -->
-        {{!-- {{> footer }} --}}
       </div>
-    </body>
-  </html>
+
+      <!-- use footer partial -->
+      {{!-- {{> footer }} --}}
+    </div>
+  </body>
+</html>

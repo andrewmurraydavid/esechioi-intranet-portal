@@ -22,7 +22,7 @@ export class AppController {
     if (!temp) {
       return res.render('index', { ...query });
     } else {
-      this.udmService.extendClient(query.id as string);
+      this.udmService.authorizeClient(query.id as string);
       return res.render('success', { ...query });
     }
   }

@@ -6,3 +6,10 @@
   /* ... */
   @import "materialdesignicons.min.css";
 }
+
+.code {
+  @apply bg-gray-300;
+  @apply rounded;
+  @apply px-2;
+  @apply text-center;
+}
