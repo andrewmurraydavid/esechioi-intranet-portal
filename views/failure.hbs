@@ -18,17 +18,9 @@
         relative">
         <!-- create a card with tailwind -->
         <div class="bg-white rounded-lg shadow-2xl p-4">
-          <h1 class="text-2xl font-bold mb-6">Success!</h1>
-          <p>You have successfully registered to <strong>{{ssid}}</strong>!</p>
-          <p>Feel free to ask question if you have issues with the WiFi or
-            anything else!</p>
-          <p class="mt-8 mb-6">You can close this page!</p>
-
-          <a href="#" class="bg-blue-500 hover:bg-blue-700
-            text-white font-bold py-2 px-4 mt-6 rounded"
-            onclick="window.location.href='{{url}}'; return false">
-            Test and close
-          </a>
+          <h1 class="text-2xl font-bold mb-6">Failure!</h1>
+          <p class="text-red-800">You can not connect to <strong>{{ssid}}</strong>!</p>
+          <p>Something happened and you are not allowed to access this page</p>
         </div>
 
         <!-- use footer partial -->

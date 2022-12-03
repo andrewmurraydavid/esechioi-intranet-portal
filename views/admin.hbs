@@ -2,11 +2,13 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <title>WiFi Portal Admin</title>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="/output.css" rel="stylesheet" />
     <link href="/md-icons.min.css" rel="stylesheet" />
 
-    <title>WiFi Portal Admin</title>
+    <script src="/public/js/jquery-3.6.1.min.js"></script>
   </head>
   <body class="bg-blue-500">
     <!-- make div which hold background image semi-transparent and full screen size -->
@@ -30,10 +32,9 @@
             <!-- ignore if no user is found -->
             {{#if user}}
             {{!-- create a stacked list With right-justified second column --}}
-            <div class="flex flex-col md:flex-row justify-between my-4 p-6
-              bg-white border
-              border-gray-200 rounded-lg shadow-md dark:bg-gray-800
-              dark:border-gray-700">
+            <div class="flex flex-col md:flex-row justify-between my-2 p-6
+              bg-white border border-gray-200 rounded-lg shadow-md
+              dark:bg-gray-800 dark:border-gray-700">
               <div class="flex flex-col w-full">
                 <div>
                   <span class="text-lg font-bold text-blue-800">
@@ -72,43 +73,44 @@
                 </div>
 
                 <form action="/admin-sta-actions" method="POST">
-                  <div class="flex flex-row justify-between mt-4 max-w-xs
-                    flex-wrap">
-                    <button type="submit" class="flex flex-row items-center
+                  <div class="flex flex-row justify-start mt-4 max-w-sm
+                    text-sm flex-wrap">
+                    <button type="submit" class="flex flex-row items-center m-1
                       justify-center px-4 py-2 bg-blue-500 text-white
                       rounded-md hover:bg-blue-600 focus:outline-none
                       focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
                       name="action" value="renew">
                       <i class="mdi mdi-autorenew"></i>
-                      <span class="ml-2">Renew</span>
+                      <span class="ml-2">Renew/Allow</span>
                     </button>
-                    <button type="submit" class="flex flex-row items-center
-                      justify-center px-4 py-2 bg-red-500 text-white
-                      rounded-md hover:bg-red-600 focus:outline-none
-                      focus:ring-2 focus:ring-red-400 focus:ring-opacity-75"
-                      name="action" value="kick">
-                      <i class="mdi mdi-logout"></i>
-                      <span class="ml-2">Kick</span>
-                    </button>
-                    {{#if blocked}}
-                    <button type="submit" class="flex flex-row items-center
+                    <button type="submit" class="flex flex-row items-center m-1
                       justify-center px-4 py-2 bg-yellow-500 text-white
                       rounded-md hover:bg-yellow-600 focus:outline-none
-                      focus:ring-2 focus:ring-yellow-400
+                      focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-75
+                      text-sm"
+                      name="action" value="kick">
+                      <i class="mdi mdi-logout"></i>
+                      <span class="ml-2">Disconnect (1 day)</span>
+                    </button>
+                    {{#if blocked}}
+                    <button type="submit" class="flex flex-row items-center m-1
+                      justify-center px-4 py-2 bg-green-500 text-white
+                      rounded-md hover:bg-green-600 focus:outline-none
+                      focus:ring-2 focus:ring-green-400 text-sm
                       focus:ring-opacity-75" name="action"
                       value="unblock">
                       <i class="mdi mdi-lock-open"></i>
                       <span class="ml-2">Unblock</span>
                     </button>
                     {{else}}
-                    <button type="submit" class="flex flex-row items-center
+                    <button type="submit" class="flex flex-row items-center m-1
                       justify-center px-4 py-2 bg-red-500 text-white
                       rounded-md hover:bg-red-600 focus:outline-none
                       focus:ring-2 focus:ring-red-400
                       focus:ring-opacity-75" name="action"
                       value="block">
                       <i class="mdi mdi-lock"></i>
-                      <span class="ml-2">Block</span>
+                      <span class="ml-2">Block (permanently)</span>
                     </button>
                     {{/if}}
                   </button>
@@ -141,7 +143,9 @@
           {{else}}
           MISSING DATA FOR: {{{macCode mac}}}
           {{/if}}
+          {{#if debug}}
           <div class="text-xs">{{{json this}}}</div>
+          {{/if}}
           {{/each}}
           {{!-- end foreach --}}
         </div>
@@ -150,5 +154,37 @@
       <!-- use footer partial -->
       {{!-- {{> footer }} --}}
     </div>
+    <script>
+
+    // make API POST calls to /admin-sta-actions
+    // with action and mac as parameters
+    // to renew, kick, block, or unblock a client
+    // then reload the page
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const formData = new FormData(form);
+        const action = event.submitter.value;
+        const mac = formData.get('mac');
+
+        fetch('/admin-sta-actions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            action,
+            mac
+          })
+        }).then(() => {
+          location.reload();
+        }).catch(err => {
+          console.error(err);
+        });
+      });
+    });
+
+    </script>
   </body>
 </html>

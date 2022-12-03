@@ -6,9 +6,8 @@ import { EntitiesModuleModule } from './entities-config/entities-module.module';
 import { MacsService } from './services/macs.service';
 import { repositoryProviders } from './Repos.providers';
 import { AdminController } from './admin.controller';
-import { HttpModule } from '@nestjs/axios';
+import { HttpModule } from './http.module';
 import { UDMProService } from './services/udmpro.service';
-import * as https from 'https';
 import { UsersService } from './services/users.service';
 
 @Module({
@@ -18,13 +17,7 @@ import { UsersService } from './services/users.service';
       envFilePath: ['.env', '.env.local'],
     }),
     EntitiesModuleModule,
-    HttpModule.register({
-      timeout: 5000,
-      baseURL: `https://${process.env.UDM_IP}/proxy/network/api/`,
-      httpsAgent: new https.Agent({
-        rejectUnauthorized: false,
-      }),
-    }),
+    HttpModule,
   ],
   controllers: [AppController, AdminController],
   providers: [

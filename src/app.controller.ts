@@ -17,13 +17,22 @@ export class AppController {
     const { query } = req;
     const temp = await this.macsService.checkMac(query.id as string);
 
-    console.log('checking', query);
-
     if (!temp) {
       return res.render('index', { ...query });
     } else {
-      this.udmService.authorizeClient(query.id as string);
-      return res.render('success', { ...query });
+      const needsAuthorization = await this.udmService.needsAuthorization(temp.callingstationid);
+      const canAuthorize = await this.udmService.canAuthorize(temp.callingstationid);
+
+      console.log('needsAuthorization', needsAuthorization, 'canAuthorize', canAuthorize);
+
+      if (!needsAuthorization) {
+        return res.render('success', { ...query, ...temp});
+      } else if (needsAuthorization && canAuthorize) {
+        this.udmService.authorizeClient(query.id as string);
+        return res.render('success', { ...query });
+      } else {
+        return res.status(401).render('failure', { ...query });
+      }
     }
   }
 
@@ -31,10 +40,18 @@ export class AppController {
   async register(@Req() req: Request, @Res() res: Response) {
     const { body } = req;
     console.log('registering', body);
-    const temp = await this.macsService.registerMac(body.mac, body.username, body.fullname);
+    const temp = await this.macsService.registerMac(
+      body.mac,
+      body.username,
+      body.fullname,
+    );
 
     if (temp) {
-      return res.render('success', { ...temp, ssid: body.ssid, url: body.redirectUrl });
+      return res.render('success', {
+        ...temp,
+        ssid: body.ssid,
+        url: body.redirectUrl,
+      });
     } else {
       return res.render('index', { ...body });
     }

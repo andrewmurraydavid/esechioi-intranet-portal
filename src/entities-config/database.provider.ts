@@ -13,6 +13,7 @@ import { Radpostauth } from 'src/entities/Radpostauth.entity';
 import { Radreply } from 'src/entities/Radreply.entity';
 import { Radusergroup } from 'src/entities/Radusergroup.entity';
 import { Users } from 'src/entities/Users.entity';
+import { Options } from 'src/entities/Options.entity';
 
 export const databaseProviders = [
   {
@@ -25,6 +26,7 @@ export const databaseProviders = [
         username: process.env.DATABASE_USER,
         password: process.env.DATABASE_PASS,
         database: process.env.DATABASE_NAME,
+        logging: true,
         entities: [
           Macs,
           Radacct,
@@ -36,6 +38,7 @@ export const databaseProviders = [
           Radreply,
           Radusergroup,
           Users,
+          Options
         ],
       });
 

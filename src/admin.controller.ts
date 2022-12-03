@@ -16,6 +16,7 @@ export class AdminController {
   @Get('/')
   @Render('admin')
   async root(@Req() req: Request) {
+    const { query } = req;
     const { data: clients } = await this.udmService
       .listGuests()
       .then((res) => res.data);
@@ -55,6 +56,7 @@ export class AdminController {
         ...activeClient,
         ...blockedClient,
         ...nonBlockedClient,
+        ...query,
       };
 
       return mergedClient;
@@ -69,6 +71,7 @@ export class AdminController {
     const { mac, action } = body;
 
     if (action === 'block') {
+      await this.udmService.unauthorizeClient(mac);
       await this.udmService.blockClient(mac);
       return res.json({ success: true });
     } else if (action === 'unblock') {
@@ -87,5 +90,15 @@ export class AdminController {
         .status(404)
         .send({ success: false, message: 'Invalid action' });
     }
+  }
+
+  @Get('/needs-authorization')
+  async needsAuthorization(@Req() req: Request, @Res() res: Response) {
+    const {query} = req;
+    const {mac} = query;
+
+    const needsAuthorization = await this.udmService.needsAuthorization(mac as string);
+
+    return res.json({needsAuthorization});
   }
 }

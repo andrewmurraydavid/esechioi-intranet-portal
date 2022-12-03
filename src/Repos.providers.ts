@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { Macs } from './entities/Macs.entity';
 import { Nas } from './entities/Nas.entity';
+import { Options } from './entities/Options.entity';
 import { Radacct } from './entities/Radacct.entity';
 import { Radcheck } from './entities/Radcheck.entity';
 import { Radpostauth } from './entities/Radpostauth.entity';
@@ -41,6 +42,11 @@ export const repositoryProviders = [
   {
     provide: 'USERS_REPOSITORY',
     useFactory: (conn: DataSource) => conn.getRepository(Users),
+    inject: ['MYSQL_CONNECTION'],
+  },
+  {
+    provide: 'OPTIONS_REPOSITORY',
+    useFactory: (conn: DataSource) => conn.getRepository(Options),
     inject: ['MYSQL_CONNECTION'],
   },
 ];

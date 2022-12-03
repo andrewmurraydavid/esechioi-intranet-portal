@@ -3,6 +3,10 @@ import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { Repository } from 'typeorm';
 import { Users } from 'src/entities/Users.entity';
+import { Options } from 'src/entities/Options.entity';
+import * as moment from 'moment';
+import { Radpostauth } from 'src/entities/Radpostauth.entity';
+import { orderBy } from 'lodash';
 
 @Injectable()
 export class UDMProService {
@@ -11,6 +15,12 @@ export class UDMProService {
 
     @Inject('USERS_REPOSITORY')
     private usersRepository: Repository<Users>,
+
+    @Inject('OPTIONS_REPOSITORY')
+    private optionsRepository: Repository<Options>,
+
+    @Inject('RADPOSTAUTH_REPOSITORY')
+    private radpostauthRepository: Repository<Radpostauth>,
   ) {}
 
   token = null as string | null;
@@ -29,11 +39,83 @@ export class UDMProService {
     return response;
   };
 
+  private _defaultDuration = 0;
+  private _defaultTimes = 1;
+
+  get defaultDuration() {
+    if (this._defaultDuration) return this._defaultDuration;
+
+    return this.optionsRepository
+      .findOne({ where: { name: 'default_duration' } })
+      .then((option) => {
+        this._defaultDuration = +option.value;
+        return this._defaultDuration;
+      });
+  }
+
+  get defaultTimes() {
+    if (this._defaultTimes) return this._defaultTimes;
+
+    return this.optionsRepository
+      .findOne({ where: { name: 'default_times' } })
+      .then((option) => {
+        this._defaultTimes = +option.value;
+        return this._defaultTimes;
+      });
+  }
+
   private generateHeaders() {
     return {
       Cookie: `TOKEN=${this.token}`,
       'X-CSRF-Token': this.csrfToken,
     };
+  }
+
+  async canAuthorize(mac) {
+    const getClientPostAuthsForToday = await this.radpostauthRepository
+      .createQueryBuilder('radpostauth')
+      .where('radpostauth.username = :username', { username: mac })
+      .andWhere('radpostauth.authdate >= :today', {
+        today: moment().startOf('day').format('YYYY-MM-DD HH:mm:ss'),
+      })
+      .andWhere('radpostauth.authdate <= :tomorrow', {
+        tomorrow: moment().endOf('day').format('YYYY-MM-DD HH:mm:ss'),
+      })
+      .getMany();
+
+    const times = await this.defaultTimes;
+    console.log('times', times);
+    console.log('connectedTimes', getClientPostAuthsForToday.length);
+
+    if (getClientPostAuthsForToday.length >= times) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  async needsAuthorization(mac: string) {
+    try {
+      await this.authorize();
+
+      const { data: guests } = await this.listGuests();
+
+      const guestWithMac = orderBy(
+        guests.data.filter((guest: any) => guest.mac === mac),
+        'start',
+        'desc',
+      ).shift();
+
+      return guestWithMac?.expired ?? true;
+    } catch (error) {
+      if (error?.response?.data) {
+        console.error("didn't get list with guests", error?.response?.data);
+      } else if (error?.response) {
+        console.error("didn't get list with guests", error?.response);
+      } else if (error) {
+        console.error("didn't get list with guests", error);
+      }
+    }
   }
 
   private async authorize() {
@@ -48,7 +130,13 @@ export class UDMProService {
         .toPromise()
         .then(this.setToken);
     } catch (error) {
-      console.error("didn't authorize", error?.response?.data);
+      if (error?.response?.data) {
+        console.error("didn't authorize", error?.response?.data);
+      } else if (error?.response) {
+        console.error("didn't authorize", error?.response);
+      } else if (error) {
+        console.error("didn't authorize", error);
+      }
     }
   }
 
@@ -66,7 +154,13 @@ export class UDMProService {
         .toPromise()
         .then(this.setToken);
     } catch (error) {
-      console.error("didn't get list with guests", error?.response?.data);
+      if (error?.response?.data) {
+        console.error("didn't get list with guests", error?.response?.data);
+      } else if (error?.response) {
+        console.error("didn't get list with guests", error?.response);
+      } else if (error) {
+        console.error("didn't get list with guests", error);
+      }
     }
   }
 
@@ -89,7 +183,7 @@ export class UDMProService {
         cmd: 'extend',
         _id: guestWithMac._id,
         duration: 5,
-        minutes: 5,
+        minutes: await this.defaultDuration,
       };
 
       return await this.httpService
@@ -103,7 +197,7 @@ export class UDMProService {
     }
   }
 
-  async authorizeClient(mac: string, minutes: number = 150) {
+  async authorizeClient(mac: string, minutes?: number) {
     try {
       await this.authorize();
 
@@ -114,7 +208,7 @@ export class UDMProService {
       const data = {
         cmd: 'authorize-guest',
         mac: mac,
-        minutes: minutes,
+        minutes: minutes ? minutes : await this.defaultDuration,
       };
 
       await this.httpService
@@ -124,9 +218,25 @@ export class UDMProService {
         .toPromise()
         .then(this.setToken);
 
-      console.log(`authorized ${mac} for 5 minutes`);
+      console.log(
+        `authorized ${mac} for ${
+          minutes ? minutes : await this.defaultDuration
+        } minutes`,
+      );
+
+      await this.radpostauthRepository.save({
+        username: mac,
+        pass: user.username,
+        reply: 'OK',
+      });
     } catch (error) {
-      console.error("didn't authorize client", error?.response?.data);
+      if (error?.response?.data) {
+        console.error("didn't authorize device", error?.response?.data);
+      } else if (error?.response) {
+        console.error("didn't authorize device", error?.response);
+      } else if (error) {
+        console.error("didn't authorize device", error);
+      }
     }
   }
 
@@ -259,6 +369,31 @@ export class UDMProService {
         .then(this.setToken);
     } catch (error) {
       console.error("didn't get non blocked clients", error?.response?.data);
+    }
+  }
+
+  async getDailyUserReport(mac: string, start?: number, end?: number) {
+    if (!start) {
+      start = moment().startOf('day').add(1, 'hour').unix() * 1000;
+    }
+    try {
+      await this.authorize();
+
+      const data = {
+        attrs: ['_id', 'time', 'uptime', 'duration', 'num_sta'],
+        macs: [mac],
+        start: start,
+        end: end,
+      };
+
+      return await this.httpService
+        .post(`/s/default/stat/report/daily.user`, data, {
+          headers: this.generateHeaders(),
+        })
+        .toPromise()
+        .then(this.setToken);
+    } catch (error) {
+      console.error("didn't get daily user report", error?.response?.data);
     }
   }
 }
