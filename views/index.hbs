@@ -7,26 +7,27 @@
     <title>WiFi Portal</title>
   </head>
   <body class="bg-blue-500">
-    <!-- make div which hold background image semi-transparent and full screen size -->
-    <div class="bg-auto bg-center bg-opacity-25 fixed w-full h-full -z-0 overflow-auto">
-      <div style="background-image: url('/images/bg-portal.jpeg')" class="h-full w-full opacity-75 fixed" />
-    </div>
+    {{> fullHero }}
 
-
-    <div class="container mx-auto p-16 max-w-screen-md opacity-100 z-10 relative overflow-auto">
+    <div class="container mx-auto p-16 max-w-screen-md opacity-100 z-10
+      relative">
       <!-- create a card with tailwind -->
       <div class="bg-white rounded-lg shadow-2xl p-4">
         <h1 class="text-2xl font-bold mb-6">Welcome!</h1>
         <form class="text-gray-600" action="register" method="POST">
-          <p>This is a the portal to access the {{ssid}}! Looks like you are trying to access <strong>{{ssid}}</strong></p>
+          <p>This is a the portal to access the {{ssid}}! Looks like you are
+            trying to access <strong>{{ssid}}</strong></p>
 
           <p class="mt-4">Here are some general rules:</p>
           <ul class="list-disc pl-4">
             <li>Do not use the WiFi for illegal activities</li>
             <li>Do not attempt to hack the WiFi</li>
-            <li>Do not use the WiFi for things which are not appropriate for your age</li>
-            <li><strong>You will have a limit for how much time you can use the WiFi</strong></li>
-            <li class="text-green-700"><i>If you have a question, feel free to ask. You will not get in trouble for asking a question.</i></li>
+            <li>Do not use the WiFi for things which are not appropriate for
+              your age</li>
+            <li><strong>You will have a limit for how much time you can use the
+                WiFi</strong></li>
+            <li class="text-green-700"><i>If you have a question, feel free to
+                ask. You will not get in trouble for asking a question.</i></li>
           </ul>
           <div class="mt-4">
             <div class="flex flex-col lg:flex-row">
@@ -37,8 +38,9 @@
                   name="fullname"
                   id="fullname"
                   required="required"
-                  class="block w-full border border-gray-300 rounded-lg p-2 mt-2"
-                />
+                  class="block w-full border border-gray-300 rounded-lg p-2
+                  mt-2"
+                  />
               </div>
 
               <div class="flex-1 mt-4 lg:mt-0 lg:ml-4">
@@ -48,16 +50,17 @@
                   name="username"
                   id="username"
                   required="required"
-                  class="block w-full border border-gray-300 rounded-lg p-2 mt-2"
-                />
+                  class="block w-full border border-gray-300 rounded-lg p-2
+                  mt-2"
+                  />
               </div>
             </div>
             <div class="flex flex-col items-center">
               <button
                 id="submit"
                 type="submit"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
-              >Submit</button>
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2
+                px-4 rounded mt-4">Submit</button>
             </div>
           </div>
           <input type="hidden" name="ssid" value="{{ssid}}" />
@@ -69,7 +72,6 @@
       <!-- use footer partial -->
       {{!-- {{> footer }} --}}
     </div>
-
     <script>
     var isSubmitting = false;
 

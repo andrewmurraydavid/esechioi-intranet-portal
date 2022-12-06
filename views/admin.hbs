@@ -11,17 +11,9 @@
     <script src="/public/js/jquery-3.6.1.min.js"></script>
   </head>
   <body class="bg-blue-500">
-    <!-- make div which hold background image semi-transparent and full screen size -->
-    <div class="bg-auto bg-center bg-opacity-25 fixed w-full h-full -z-0
-      overflow-auto">
-      <div style="background-image: url('/images/bg-portal.jpeg')" class="h-full
-        w-full opacity-75 fixed" />
-      </div>
+    {{> fullHero }}
 
-
-      <div class="container mx-auto p-8 md:p-16 max-w-screen-xlg opacity-100
-        z-10
-        relative overflow-auto">
+      <div class="container mx-auto p-8 md:p-16 max-w-screen-xlg opacity-100 z-10 relative">
         <!-- create a card with tailwind -->
         <div class="bg-white rounded-lg shadow-2xl p-4">
           <h1 class="text-2xl font-bold mb-6">Welcome!</h1>
@@ -33,8 +25,7 @@
             {{#if user}}
             {{!-- create a stacked list With right-justified second column --}}
             <div class="flex flex-col md:flex-row justify-between my-2 p-6
-              bg-white border border-gray-200 rounded-lg shadow-md
-              dark:bg-gray-800 dark:border-gray-700">
+              bg-white border border-gray-200 rounded-lg shadow-md">
               <div class="flex flex-col w-full">
                 <div>
                   <span class="text-lg font-bold text-blue-800">
@@ -43,12 +34,12 @@
                   as {{user.username}}
                 </div>
                 {{#if last_seen}}
-                <div class="text-sm text-gray-600 dark:text-gray-400">
+                <div class="text-sm text-gray-600">
                   Last seen: {{dateTime last_seen}}
                 </div>
                 {{/if}}
                 {{#if (eq status 'online')}}
-                <div class="text-gray-600 dark:text-gray-400 text-sm">
+                <div class="text-gray-600text-sm">
                   <i class="mdi mdi-lan-connect text-lg"></i>
                   They are currently connected to: <strong>{{essid}}</strong>
                   and have been for
@@ -57,7 +48,7 @@
                 {{else}}
                 <div class="text-sm">
                   <i class="mdi mdi-lan-disconnect text-lg"></i>
-                  <span class="text-red-600 dark:text-red-400 italic">They are
+                  <span class="text-red-600 italic">They are
                     currently offline</span>
                 </div>
                 {{/if}}
