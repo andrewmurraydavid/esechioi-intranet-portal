@@ -6,9 +6,18 @@ import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as hbs from 'hbs';
 import { DateTime } from 'luxon';
+import * as fs from 'fs';
+import * as chalk from 'chalk';
+
+const httpsOptions = {
+  key: fs.readFileSync('/app/certs/private-key.pem'),
+  cert: fs.readFileSync('/app/certs/public-certificate.pem'),
+};
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    httpsOptions,
+  });
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
@@ -69,6 +78,35 @@ async function bootstrap() {
     module.hot.dispose(() => app.close());
   }
 
-  await app.listen(80);
+  await app.listen(443);
+
+  // create :80 server to redirect to :443
+  const http = require('http');
+  const httpApp = http.createServer((req, res, next) => {
+    console.log(
+      chalk.green(
+        `[HTTP:80] ${process.pid} - ${
+          // days with double digits and time in 12 hour format
+          chalk.bold(DateTime.now().toFormat('MM/dd/yyyy hh:mm:ss a'))
+        } \t Redirecting [${chalk.blueBright.bold(
+          req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+        )}] to ${chalk.whiteBright.bold(
+          `https://${req.headers.host}${req.url}`,
+        )}`,
+      ),
+    );
+    
+    // // if the host is an ip, ignore it
+    // if (req.headers.host.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)) {
+    //   return next();
+    // }
+    
+
+    res.writeHead(301, {
+      Location: 'https://' + req.headers['host'] + req.url,
+    });
+    res.end();
+  });
+  httpApp.listen(80);
 }
 bootstrap();

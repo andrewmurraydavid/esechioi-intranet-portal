@@ -34,6 +34,7 @@
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/typeorm": "^9.0.1",
     "@types/lodash": "^4.14.191",
+    "@types/luxon": "^3.1.0",
     "apollo-server-express": "^3.11.1",
     "autoprefixer": "^10.4.13",
     "chalk": "4",
