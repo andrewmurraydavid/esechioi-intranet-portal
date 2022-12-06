@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { Repository } from 'typeorm';
@@ -23,8 +23,9 @@ export class UDMProService {
     private radpostauthRepository: Repository<Radpostauth>,
   ) {}
 
-  token = null as string | null;
-  csrfToken = null as string | null;
+  private readonly logger = new Logger(UDMProService.name);
+  private token = null as string | null;
+  private csrfToken = null as string | null;
 
   private readonly API_V2_BASE_URL = `https://${process.env.UDM_IP}/proxy/network/v2/api`;
 
@@ -84,8 +85,7 @@ export class UDMProService {
       .getMany();
 
     const times = await this.defaultTimes;
-    console.log('times', times);
-    console.log('connectedTimes', getClientPostAuthsForToday.length);
+    this.logger.log(`allowed times: [${times}]; used times: [${getClientPostAuthsForToday.length}]`);
 
     if (getClientPostAuthsForToday.length >= times) {
       return false;
@@ -109,11 +109,11 @@ export class UDMProService {
       return guestWithMac?.expired ?? true;
     } catch (error) {
       if (error?.response?.data) {
-        console.error("didn't get list with guests", error?.response?.data);
+        this.logger.error("didn't get list with guests", error?.response?.data);
       } else if (error?.response) {
-        console.error("didn't get list with guests", error?.response);
+        this.logger.error("didn't get list with guests", error?.response);
       } else if (error) {
-        console.error("didn't get list with guests", error);
+        this.logger.error("didn't get list with guests", error);
       }
     }
   }
@@ -131,11 +131,11 @@ export class UDMProService {
         .then(this.setToken);
     } catch (error) {
       if (error?.response?.data) {
-        console.error("didn't authorize", error?.response?.data);
+        this.logger.error("didn't authorize", error?.response?.data);
       } else if (error?.response) {
-        console.error("didn't authorize", error?.response);
+        this.logger.error("didn't authorize", error?.response);
       } else if (error) {
-        console.error("didn't authorize", error);
+        this.logger.error("didn't authorize", error);
       }
     }
   }
@@ -155,11 +155,11 @@ export class UDMProService {
         .then(this.setToken);
     } catch (error) {
       if (error?.response?.data) {
-        console.error("didn't get list with guests", error?.response?.data);
+        this.logger.error("didn't get list with guests", error?.response?.data);
       } else if (error?.response) {
-        console.error("didn't get list with guests", error?.response);
+        this.logger.error("didn't get list with guests", error?.response);
       } else if (error) {
-        console.error("didn't get list with guests", error);
+        this.logger.error("didn't get list with guests", error);
       }
     }
   }
@@ -193,7 +193,7 @@ export class UDMProService {
         .toPromise()
         .then(this.setToken);
     } catch (error) {
-      console.error("didn't extend device", error?.response?.data);
+      this.logger.error("didn't extend device", error?.response?.data);
     }
   }
 
@@ -218,7 +218,7 @@ export class UDMProService {
         .toPromise()
         .then(this.setToken);
 
-      console.log(
+      this.logger.log(
         `authorized ${mac} for ${
           minutes ? minutes : await this.defaultDuration
         } minutes`,
@@ -231,11 +231,11 @@ export class UDMProService {
       });
     } catch (error) {
       if (error?.response?.data) {
-        console.error("didn't authorize device", error?.response?.data);
+        this.logger.error("didn't authorize device", error?.response?.data);
       } else if (error?.response) {
-        console.error("didn't authorize device", error?.response);
+        this.logger.error("didn't authorize device", error?.response);
       } else if (error) {
-        console.error("didn't authorize device", error);
+        this.logger.error("didn't authorize device", error);
       }
     }
   }
@@ -256,9 +256,9 @@ export class UDMProService {
         .toPromise()
         .then(this.setToken);
 
-      console.log(`unauthorized ${mac}`);
+      this.logger.log(`unauthorized ${mac}`);
     } catch (error) {
-      console.error("didn't unauthorize client", error?.response?.data);
+      this.logger.error("didn't unauthorize client", error?.response?.data);
     }
   }
 
@@ -278,9 +278,9 @@ export class UDMProService {
         .toPromise()
         .then(this.setToken);
 
-      console.log(`blocked ${mac}`);
+      this.logger.log(`blocked ${mac}`);
     } catch (error) {
-      console.error("didn't block client", error?.response?.data);
+      this.logger.error("didn't block client", error?.response?.data);
     }
   }
 
@@ -300,9 +300,9 @@ export class UDMProService {
         .toPromise()
         .then(this.setToken);
 
-      console.log(`unblocked ${mac}`);
+      this.logger.log(`unblocked ${mac}`);
     } catch (error) {
-      console.error("didn't unblock client", error?.response?.data);
+      this.logger.error("didn't unblock client", error?.response?.data);
     }
   }
 
@@ -317,7 +317,7 @@ export class UDMProService {
         .toPromise()
         .then(this.setToken);
     } catch (error) {
-      console.error("didn't get blocked clients", error?.response?.data);
+      this.logger.error("didn't get blocked clients", error?.response?.data);
     }
   }
 
@@ -335,7 +335,7 @@ export class UDMProService {
         .toPromise()
         .then(this.setToken);
     } catch (error) {
-      console.error("didn't get active clients", error?.response?.data);
+      this.logger.error("didn't get active clients", error?.response?.data);
     }
   }
 
@@ -351,8 +351,8 @@ export class UDMProService {
         .toPromise()
         .then(this.setToken);
     } catch (error) {
-      console.error(error);
-      console.error("didn't get blocked clients", error?.response?.data);
+      this.logger.error(error);
+      this.logger.error("didn't get blocked clients", error?.response?.data);
     }
   }
 
@@ -368,7 +368,7 @@ export class UDMProService {
         .toPromise()
         .then(this.setToken);
     } catch (error) {
-      console.error("didn't get non blocked clients", error?.response?.data);
+      this.logger.error("didn't get non blocked clients", error?.response?.data);
     }
   }
 
@@ -393,7 +393,7 @@ export class UDMProService {
         .toPromise()
         .then(this.setToken);
     } catch (error) {
-      console.error("didn't get daily user report", error?.response?.data);
+      this.logger.error("didn't get daily user report", error?.response?.data);
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Render, Req, Res } from '@nestjs/common';
+import { Controller, Get, Logger, Post, Render, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AppService } from './app.service';
 import { MacsService } from './services/macs.service';
@@ -23,8 +23,6 @@ export class AppController {
       const needsAuthorization = await this.udmService.needsAuthorization(temp.callingstationid);
       const canAuthorize = await this.udmService.canAuthorize(temp.callingstationid);
 
-      console.log('needsAuthorization', needsAuthorization, 'canAuthorize', canAuthorize);
-
       if (!needsAuthorization) {
         return res.render('success', { ...query, ...temp});
       } else if (needsAuthorization && canAuthorize) {
@@ -39,7 +37,6 @@ export class AppController {
   @Post('/register')
   async register(@Req() req: Request, @Res() res: Response) {
     const { body } = req;
-    console.log('registering', body);
     const temp = await this.macsService.registerMac(
       body.mac,
       body.username,

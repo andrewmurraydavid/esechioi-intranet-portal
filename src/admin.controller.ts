@@ -43,9 +43,6 @@ export class AdminController {
       includeTrafficUsage: true,
     });
 
-    console.log('blockedClients', blockedClients.length);
-    console.log('nonBlocked', nonBlocked.length);
-
     const mergedClients = sortedClients.map((client) => {
       const blockedClient = blockedClients.find((bc) => bc.mac === client.mac);
       const nonBlockedClient = nonBlocked.find((nbc) => nbc.mac === client.mac);
